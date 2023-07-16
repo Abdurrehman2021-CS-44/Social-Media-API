@@ -77,6 +77,15 @@ app.route("/profiles")
         res.send(err);
     })
 })
+.delete((req, res)=>{
+    Profile.deleteMany({})
+    .then(()=>{
+        res.send("All profiles has been deleted.")
+    })
+    .catch((err)=>{
+        res.send(err)
+    })
+});
 
 app.listen(3000, (req, res)=>{
     console.log('Server is running on port 3000');
