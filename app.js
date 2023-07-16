@@ -62,13 +62,16 @@ app.route("/profiles")
 })
 .post((req, res)=>{
     const {twitter, instagram, linkedin, ...rest} = req.body;
+
+    const social = {
+        ...( twitter && {twitter} ),
+        ...( instagram && {instagram} ),
+        ...( linkedin && {linkedin} )
+    }
+
     const profile = new Profile({
         ...rest,
-        social: {
-            twitter,
-            instagram,
-            linkedin
-        }
+        ...(Object.keys(social).length && {social})
     });
     profile.save()
     .then(()=>{
@@ -90,7 +93,7 @@ app.route("/profiles")
 
 app.route("/profiles/:specifiedProfile")
 .get((req, res)=>{
-    let speProfile = _.lowerCase(req.params.specifiedProfile);
+    let speProfile = req.params.specifiedProfile;
     Profile.findOne({username: speProfile})
     .then((profileFound)=>{
         res.send(profileFound);
@@ -98,28 +101,61 @@ app.route("/profiles/:specifiedProfile")
     .catch((err)=>{
         res.send(err);
     });
+    // res.send(speProfile)
 })
 .put((req, res)=>{
     //update the existing document with updated data from request body and save it to database
     const {twitter, instagram, linkedin, ...rest} = req.body;
 
+    const social = {
+        ...( twitter && {twitter} ),
+        ...( instagram && {instagram} ),
+        ...( linkedin && {linkedin} )
+    }
+
     const profile = {
         ...rest,
-        social: {
-            twitter,
-            instagram,
-            linkedin
-        }
+        ...(Object.keys(social).length && {social})
     }
 
     Profile.replaceOne({username: req.params.specifiedProfile}, {...profile})
     .then(()=>{
-        res.send("Successfully replaced the specified profile with the given object");
+        res.send("Successfully replaced the specified profile with the given object.");
     })
     .catch((err)=>{
         res.send(err);
     });
 })
+.patch((req, res)=>{
+    const {twitter, instagram, linkedin, ...rest} = req.body;
+
+    Profile.findOne({username: req.params.specifiedProfile})
+    .then((profileFound)=>{
+        console.log(profileFound.social);
+        const social = {
+            ...profileFound.social,
+            ...(twitter && { twitter }),
+            ...(instagram && { instagram }),
+            ...(linkedin && { linkedin })
+        };
+    
+        const profile = {
+            ...rest,
+            ...(Object.keys(social).length && {social})
+        }
+    
+        console.log(profile);
+    
+        Profile.updateOne({username: req.params.specifiedProfile}, {$set: profile})
+        .then(()=>{
+            res.send("Successfully updated the specified profile with the given info.");
+        })
+        .catch((err)=>{
+            res.send(err);
+        });
+    })
+
+});
 
 
 
