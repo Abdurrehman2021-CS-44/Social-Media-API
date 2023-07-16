@@ -155,6 +155,15 @@ app.route("/profiles/:specifiedProfile")
         });
     })
 
+})
+.delete((req, res)=>{
+    Profile.deleteOne({username: req.params.specifiedProfile})
+    .then(()=>{
+        res.send("Successfully deleted the specified profile.");
+    })
+    .catch((err)=>{
+        res.send(err);
+    });
 });
 
 
