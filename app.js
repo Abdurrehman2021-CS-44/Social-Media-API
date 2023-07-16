@@ -7,6 +7,9 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}))
 
 mongoose.connect("mongodb://127.0.0.1/socialMediaDB")
+.then(()=>{
+    console.log("Database is connected.");
+});
 
 const profileSchema = new mongoose.Schema({
     id: String,
@@ -27,7 +30,6 @@ const profileSchema = new mongoose.Schema({
 const Profile = new mongoose.model("profile", profileSchema);
 
 const profile = new Profile({
-    id: "12345",
     username: "abdurrehman1359",
     email: "abdurrehmanbinfaheem@gmail.com",
     name: "Abdur Rehman Khan",
@@ -42,14 +44,20 @@ const profile = new Profile({
     }
 });
 
-profile.save()
-.then(()=>{
-    console.log("Profile saved successfully");
-})
+// profile.save()
+// .then(()=>{
+//     console.log("Profile saved successfully");
+// })
 
 app.route("/profiles")
 .get((req, res) =>{ 
-
+    Profile.find({})
+    .then((profilesFound)=>{
+        res.send(profilesFound)
+    })
+    .catch((err)=>{
+        res.send(err)
+    })
 })
 
 app.listen(3000, (req, res)=>{
