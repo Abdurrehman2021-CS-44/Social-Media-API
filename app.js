@@ -59,6 +59,24 @@ app.route("/profiles")
         res.send(err)
     })
 })
+.post((req, res)=>{
+    const {twitter, instagram, linkedin, ...rest} = req.body;
+    const profile = new Profile({
+        ...rest,
+        social: {
+            twitter,
+            instagram,
+            linkedin
+        }
+    });
+    profile.save()
+    .then(()=>{
+        res.send("Successfully saved");
+    })
+    .catch((err)=>{
+        res.send(err);
+    })
+})
 
 app.listen(3000, (req, res)=>{
     console.log('Server is running on port 3000');
