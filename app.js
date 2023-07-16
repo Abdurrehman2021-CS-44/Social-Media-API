@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const _ = require("lodash");
 
 const app = express();
 
@@ -86,6 +87,21 @@ app.route("/profiles")
         res.send(err)
     })
 });
+
+app.route("/profiles/:specifiedProfile")
+.get((req, res)=>{
+    let specifiedProfile = _.lowerCase(req.params.specifiedProfile);
+    Profile.findOne({username: specifiedProfile})
+    .then((profileFound)=>{
+        res.send(profileFound);
+    })
+    .catch((err)=>{
+        res.send(err);
+    })
+})
+
+
+
 
 app.listen(3000, (req, res)=>{
     console.log('Server is running on port 3000');
