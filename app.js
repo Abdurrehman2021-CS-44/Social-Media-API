@@ -90,14 +90,35 @@ app.route("/profiles")
 
 app.route("/profiles/:specifiedProfile")
 .get((req, res)=>{
-    let specifiedProfile = _.lowerCase(req.params.specifiedProfile);
-    Profile.findOne({username: specifiedProfile})
+    let speProfile = _.lowerCase(req.params.specifiedProfile);
+    Profile.findOne({username: speProfile})
     .then((profileFound)=>{
         res.send(profileFound);
     })
     .catch((err)=>{
         res.send(err);
+    });
+})
+.put((req, res)=>{
+    //update the existing document with updated data from request body and save it to database
+    const {twitter, instagram, linkedin, ...rest} = req.body;
+
+    const profile = {
+        ...rest,
+        social: {
+            twitter,
+            instagram,
+            linkedin
+        }
+    }
+
+    Profile.replaceOne({username: req.params.specifiedProfile}, {...profile})
+    .then(()=>{
+        res.send("Successfully replaced the specified profile with the given object");
     })
+    .catch((err)=>{
+        res.send(err);
+    });
 })
 
 
